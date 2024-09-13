@@ -1,21 +1,21 @@
 import binascii
 import hashlib
 
-from .exceptions import ElementNotInDom, PropsError, PageError
+from .exceptions import ElementNotInDom, PageError, PropsError
 from .reactivity import ReactiveDict, Stateful
 from .runtime import (
+    CustomEvent,
     add_event_listener,
-    remove_event_listener,
     create_proxy,
     document,
     is_server_side,
+    remove_event_listener,
     setTimeout,
-    CustomEvent,
 )
 from .util import (
-    mixed_to_underscores,
-    merge_classes,
     _extract_event_handlers,
+    merge_classes,
+    mixed_to_underscores,
     patch_dom_element,
 )
 
@@ -140,7 +140,9 @@ class Tag:
         if "id" in kwargs:
             self._element_id = kwargs["id"]
         elif self._page and self._page.application:
-            self._element_id = self._page.application.element_id_generator.get_id_for_element(self)
+            self._element_id = (
+                self._page.application.element_id_generator.get_id_for_element(self)
+            )
         else:
             self._element_id = f"ppauto-{id(self)}"
 
@@ -155,7 +157,9 @@ class Tag:
         if isinstance(parent_component, Component):
             self.parent_component = parent_component
         elif parent_component:
-            raise Exception(f"Unknown parent_component type {type(parent_component)}: {repr(parent_component)}")
+            raise Exception(
+                f"Unknown parent_component type {type(parent_component)}: {repr(parent_component)}"
+            )
         else:
             self.parent_component = None
 
@@ -413,9 +417,14 @@ class Tag:
         else:
             existing_handler = self._manually_added_event_listeners[event]
             if isinstance(existing_handler, (list, tuple)):
-                self._manually_added_event_listeners[event] = [existing_handler] + list(handler)
+                self._manually_added_event_listeners[event] = [existing_handler] + list(
+                    handler
+                )
             else:
-                self._manually_added_event_listeners[event] = [existing_handler, handler]
+                self._manually_added_event_listeners[event] = [
+                    existing_handler,
+                    handler,
+                ]
         if self._rendered_element:
             self._add_event_listener(self._rendered_element, event, handler)
 
@@ -542,7 +551,9 @@ class Tag:
         if is_server_side:
             old_active_element_id = None
         else:
-            old_active_element_id = self.document.activeElement.id if self.document.activeElement else None
+            old_active_element_id = (
+                self.document.activeElement.id if self.document.activeElement else None
+            )
 
             self.recursive_call("_retain_implicit_attrs")
 
@@ -581,10 +592,9 @@ class Tag:
             print("Triggering event with underscores. Did you mean dashes?: ", event)
 
         # noinspection PyUnresolvedReferences
-        from pyscript.ffi import to_js
-
         # noinspection PyUnresolvedReferences
-        from js import Object, Map
+        from js import Map, Object
+        from pyscript.ffi import to_js
 
         if detail:
             event_object = to_js({"detail": Map.new(Object.entries(to_js(detail)))})
@@ -712,7 +722,9 @@ class Component(Tag, Stateful):
             if key in redraw_rule:
                 self.page.redraw_tag(self)
         else:
-            raise Exception(f"Unknown value for redraw rule: {redraw_rule} (context: {context})")
+            raise Exception(
+                f"Unknown value for redraw rule: {redraw_rule} (context: {context})"
+            )
 
     def insert_slot(self, name="default", **kwargs):
         """
@@ -726,9 +738,17 @@ class Component(Tag, Stateful):
             Slot: The inserted slot object.
         """
         if name in self.slots:
-            self.slots[name].parent = Tag.stack[-1]  # The children will be cleared during redraw, so re-establish
+            self.slots[name].parent = Tag.stack[
+                -1
+            ]  # The children will be cleared during redraw, so re-establish
         else:
-            self.slots[name] = Slot(ref=f"slot={name}", slot_name=name, page=self.page, parent=Tag.stack[-1], **kwargs)
+            self.slots[name] = Slot(
+                ref=f"slot={name}",
+                slot_name=name,
+                page=self.page,
+                parent=Tag.stack[-1],
+                **kwargs,
+            )
         slot = self.slots[name]
         if self.origin:
             slot.origin = self.origin
@@ -766,7 +786,9 @@ class Component(Tag, Stateful):
         return False
 
     def __str__(self):
-        return f"{self.component_name or self.__class__.__name__} ({self.ref} {id(self)})"
+        return (
+            f"{self.component_name or self.__class__.__name__} ({self.ref} {id(self)})"
+        )
 
     def __repr__(self):
         return f"<{self}>"
@@ -883,7 +905,9 @@ class Builder:
         # Determine ref value
         ref_part = "__" + (
             f"{parent.ref}.{tag_name}{len(parent.children) + 1}_"
-            + (binascii.hexlify(hashlib.sha256(str(kwargs).encode()).digest()))[:8].decode("utf8")
+            + (binascii.hexlify(hashlib.sha256(str(kwargs).encode()).digest()))[
+                :8
+            ].decode("utf8")
         ).lstrip("_")
 
         ref = kwargs.pop("ref", ref_part)

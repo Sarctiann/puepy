@@ -21,9 +21,8 @@ if platform == PLATFORM_PYODIDE:
     from pyodide.ffi import create_proxy
     from pyodide.ffi.wrappers import add_event_listener, remove_event_listener
 elif platform == PLATFORM_MICROPYTHON:
-    from pyscript.ffi import create_proxy
-
     from js import addEventListener, removeEventListener
+    from pyscript.ffi import create_proxy
 
     def add_event_listener(elt, event, listener):
         return elt.addEventListener(event, listener)
@@ -34,7 +33,9 @@ elif platform == PLATFORM_MICROPYTHON:
     # add_event_listener, remove_event_listener = addEventListener, removeEventListener
 
 if is_server_side:
-    document = setTimeout = Object = CustomEvent = window = history = add_event_listener = remove_event_listener = None
+    document = setTimeout = Object = CustomEvent = window = history = (
+        add_event_listener
+    ) = remove_event_listener = None
 
     def create_proxy(obj):
         return obj
@@ -43,7 +44,7 @@ if is_server_side:
         fn()
 
 else:
-    from js import document, setTimeout, Object, CustomEvent, window, history
+    from js import CustomEvent, Object, document, history, setTimeout, window
 
     def next_tick(fn):
         setTimeout(create_proxy(fn), 100)

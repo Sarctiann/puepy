@@ -5,6 +5,7 @@ Classes:
     Listener: A simple class that notifies a collection of callback functions when its `notify` method is called
     ReactiveDict: A dictionary that notifies a listener when it is updated
 """
+
 import logging
 from functools import partial
 
@@ -53,7 +54,11 @@ class Listener:
             try:
                 callback(*args, **kwargs)
             except Exception as e:
-                logging.exception("Error in callback for {self}: {callback}:".format(self=self, callback=callback))
+                logging.exception(
+                    "Error in callback for {self}: {callback}:".format(
+                        self=self, callback=callback
+                    )
+                )
 
     def __str__(self):
         if len(self.callbacks) == 1:

@@ -37,9 +37,13 @@ class Handler(server.SimpleHTTPRequestHandler):
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="A simple HTTP server to serve examples of PuePy")
+    parser = argparse.ArgumentParser(
+        description="A simple HTTP server to serve examples of PuePy"
+    )
     parser.add_argument("--host", default="", help="The host on which the server runs")
-    parser.add_argument("--port", type=int, default=8000, help="The port on which the server listens")
+    parser.add_argument(
+        "--port", type=int, default=8000, help="The port on which the server listens"
+    )
     args = parser.parse_args()
 
     os.chdir(project_path)

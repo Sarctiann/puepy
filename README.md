@@ -3,7 +3,9 @@
 ➡️ [Project Website](https://puepy.dev)
 📝 [Project Documentation](https://docs.puepy.dev/)
 
-PuePy is a lightweight web framework that uses WebAssembly via [PyScript](https://pyscript.net) to put Python right in your browser with all the modern conveniences of a web framework, but none of the headaches of Webpack, NPM or even JavaScript.
+PuePy is a lightweight web framework that uses WebAssembly via [PyScript](https://pyscript.net)
+to put Python right in your browser with all the modern conveniences of a web
+framework, but none of the headaches of Webpack, NPM or even JavaScript.
 
 - Reactive data binding with component-based architecture
 - Single Page App (SPA) router included
@@ -12,7 +14,9 @@ PuePy is a lightweight web framework that uses WebAssembly via [PyScript](https:
 
 ## 🐒 Try a demo app
 
-See [ExpenseLemur.com](https://expenselemur.com) and the [Expense Lemur Github Repo](https://github.com/kkinder/expenselemur) for a demonstration of what PuePy is capable of.
+See [ExpenseLemur.com](https://expenselemur.com) and the
+[Expense Lemur Github Repo](https://github.com/kkinder/expenselemur) for a
+demonstration of what PuePy is capable of.
 
 ## 🧑‍💻 See some code
 

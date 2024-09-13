@@ -1,4 +1,4 @@
-from .runtime import is_server_side, create_proxy, Object, platform, PLATFORM_PYODIDE
+from .runtime import PLATFORM_PYODIDE, Object, create_proxy, is_server_side, platform
 
 try:
     from pyscript.ffi import to_js
@@ -31,7 +31,9 @@ def merge_classes(*items):
             classes.update(class_option)
         elif isinstance(class_option, dict):
             classes.update([key for key, value in class_option.items() if value])
-            exclude_classes.update([key for key, value in class_option.items() if not value])
+            exclude_classes.update(
+                [key for key, value in class_option.items() if not value]
+            )
         elif class_option is None:
             pass
         elif isinstance(class_option, CssClass):
@@ -115,7 +117,10 @@ def patch_dom_element(source_element, target_element):
         target_child = target_child_nodes[i] if len(target_child_nodes) > i else None
 
         if source_child and target_child:
-            if source_child.nodeName == target_child.nodeName and target_child.nodeName == "#text":
+            if (
+                source_child.nodeName == target_child.nodeName
+                and target_child.nodeName == "#text"
+            ):
                 target_child.nodeValue = source_child.nodeValue
             elif source_child.nodeName == target_child.nodeName:
                 patch_dom_element(source_child, target_child)

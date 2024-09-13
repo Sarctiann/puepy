@@ -19,8 +19,8 @@ Classes:
 """
 
 from .core import Page
-from .runtime import window, history, platform, PLATFORM_MICROPYTHON, is_server_side
-from .util import mixed_to_underscores, jsobj
+from .runtime import PLATFORM_MICROPYTHON, history, is_server_side, platform, window
+from .util import jsobj, mixed_to_underscores
 
 
 def _micropython_parse_query_string(query_string):
@@ -84,7 +84,7 @@ else:
     from urllib.parse import quote as url_quote
 
 if is_server_side:
-    from urllib.parse import urlparse, parse_qs
+    from urllib.parse import parse_qs, urlparse
 
     def parse_query_string(qs):
         return parse_qs(urlparse(qs).query)
@@ -109,7 +109,9 @@ class Route:
         use the @app.page decorator to define a route at the time you define your Pages.
     """
 
-    def __init__(self, path_match: str, page: Page, name: str, base_path: str, router=None):
+    def __init__(
+        self, path_match: str, page: Page, name: str, base_path: str, router=None
+    ):
         """
         Args:
             path_match (str): The path match pattern used for routing.
@@ -189,7 +191,9 @@ class Route:
             path = result
 
         if kwargs:
-            path += "?" + "&".join(f"{url_quote(k)}={url_quote(v)}" for k, v in kwargs.items())
+            path += "?" + "&".join(
+                f"{url_quote(k)}={url_quote(v)}" for k, v in kwargs.items()
+            )
         return path
 
     def __str__(self):
@@ -254,7 +258,9 @@ class Router:
         if route in self.routes:
             raise ValueError(f"Route already added: {route}")
         if route.name in self.routes_by_name:
-            raise ValueError(f"Route name already exists for another route: {route.name}")
+            raise ValueError(
+                f"Route name already exists for another route: {route.name}"
+            )
         self.routes.append(route)
         self.routes_by_name[route.name] = route
         self.routes_by_page[route.page] = route
@@ -272,7 +278,14 @@ class Router:
         # Convert path to a simple pattern without regex
         if not name:
             name = mixed_to_underscores(page_class.__name__)
-        self.add_route_instance(Route(path_match=path_match, page=page_class, name=name, base_path=self.base_path))
+        self.add_route_instance(
+            Route(
+                path_match=path_match,
+                page=page_class,
+                name=name,
+                base_path=self.base_path,
+            )
+        )
 
     def reverse(self, destination, **kwargs):
         """
@@ -346,7 +359,9 @@ class Router:
         if isinstance(path, type) and issubclass(path, Page):
             path = self.reverse(path, **kwargs)
         elif kwargs:
-            path += "?" + "&".join(f"{url_quote(k)}={url_quote(v)}" for k, v in kwargs.items())
+            path += "?" + "&".join(
+                f"{url_quote(k)}={url_quote(v)}" for k, v in kwargs.items()
+            )
 
         if self.link_mode == self.LINK_MODE_DIRECT:
             window.location = path

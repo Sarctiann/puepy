@@ -4,11 +4,11 @@ import sys
 from puepy.storage import BrowserStorage
 
 from . import exceptions
-from .core import Page, t, Prop
+from .core import Page, Prop, t
 from .reactivity import ReactiveDict, Stateful
 from .runtime import (
-    is_server_side,
     add_event_listener,
+    is_server_side,
     window,
 )
 
@@ -33,7 +33,11 @@ class TracebackErrorPage(Page):
             sys.print_exception(self.error, buf)
             return buf.getvalue()
 
-        return "\n".join(traceback.format_exception(type(self.error), self.error, self.error.__traceback__))
+        return "\n".join(
+            traceback.format_exception(
+                type(self.error), self.error, self.error.__traceback__
+            )
+        )
 
     def populate(self):
         t.h1(f"Error: {self.error}")
@@ -173,8 +177,13 @@ class Application(Stateful):
 
     def _on_popstate(self, event):
         if self.router.link_mode == self.router.LINK_MODE_HASH:
-            self.mount(self._selector_or_element, window.location.hash.split("#", 1)[-1])
-        elif self.router.link_mode in (self.router.LINK_MODE_DIRECT, self.router.LINK_MODE_HTML5):
+            self.mount(
+                self._selector_or_element, window.location.hash.split("#", 1)[-1]
+            )
+        elif self.router.link_mode in (
+            self.router.LINK_MODE_DIRECT,
+            self.router.LINK_MODE_HTML5,
+        ):
             self.mount(self._selector_or_element, window.location.pathname)
 
     def remount(self, path=None, page_kwargs=None):
@@ -248,12 +257,22 @@ class Application(Stateful):
         """
         if self.router.link_mode == self.router.LINK_MODE_HASH:
             return window.location.hash.split("#", 1)[-1]
-        elif self.router.link_mode in (self.router.LINK_MODE_DIRECT, self.router.LINK_MODE_HTML5):
+        elif self.router.link_mode in (
+            self.router.LINK_MODE_DIRECT,
+            self.router.LINK_MODE_HTML5,
+        ):
             return window.location.pathname
         else:
             return ""
 
-    def mount_page(self, selector_or_element, page_class, route, page_kwargs, handle_exceptions=True):
+    def mount_page(
+        self,
+        selector_or_element,
+        page_class,
+        route,
+        page_kwargs,
+        handle_exceptions=True,
+    ):
         """
         Mounts a page on the specified selector or element with the given parameters.
 
@@ -280,9 +299,13 @@ class Application(Stateful):
                 if prop.type is list:
                     prop_args[prop.name] = value if isinstance(value, list) else [value]
                 else:
-                    prop_args[prop.name] = value if not isinstance(value, list) else value[0]
+                    prop_args[prop.name] = (
+                        value if not isinstance(value, list) else value[0]
+                    )
 
-        self.active_page: Page = page_class(matched_route=route, application=self, extra_args=page_kwargs, **prop_args)
+        self.active_page: Page = page_class(
+            matched_route=route, application=self, extra_args=page_kwargs, **prop_args
+        )
         try:
             self.active_page.mount(selector_or_element)
         except exceptions.PageError as e:
@@ -325,7 +348,11 @@ class Application(Stateful):
             exception (Exception): The exception that occurred.
         """
         self.mount_page(
-            self._selector_or_element, self.not_found_page, None, {"error": exception}, handle_exceptions=False
+            self._selector_or_element,
+            self.not_found_page,
+            None,
+            {"error": exception},
+            handle_exceptions=False,
         )
 
     def handle_forbidden(self, exception):
@@ -353,7 +380,11 @@ class Application(Stateful):
             exception (Exception): The exception that occurred.
         """
         self.mount_page(
-            self._selector_or_element, self.unauthorized_page, None, {"error": exception}, handle_exceptions=False
+            self._selector_or_element,
+            self.unauthorized_page,
+            None,
+            {"error": exception},
+            handle_exceptions=False,
         )
 
     def handle_error(self, exception):
@@ -364,7 +395,13 @@ class Application(Stateful):
         Args:
             exception (Exception): The exception that occurred.
         """
-        self.mount_page(self._selector_or_element, self.error_page, None, {"error": exception}, handle_exceptions=False)
+        self.mount_page(
+            self._selector_or_element,
+            self.error_page,
+            None,
+            {"error": exception},
+            handle_exceptions=False,
+        )
         if is_server_side:
             raise
 
